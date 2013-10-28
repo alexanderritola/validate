@@ -1,19 +1,14 @@
 package validate
 
 import (
-	"bytes"
+	"errors"
 	"unicode"
 	"unicode/utf8"
 )
 
-// ErrorLevel specifies what type of validation error was encountered
-type ErrorLevel int
-
-// Error levels
-const (
-	NoError  = iota // No error was found
-	Format          // Data did not match the formatting requirements
-	Critical        // Data contained control or non-printable characters
+var (
+	Format 		= errors.New("validate: Data did not match the formatting requirements")
+	Critical	= errors.New("validate: Data contained control or non-printable characters")
 )
 
 var (
@@ -26,7 +21,7 @@ var (
 	//	upAlphabet = []byte("EITSANHURDMWGVLFBKOPJXCZYQ")
 )
 
-// Check to ensure the byte slice only contains printable utf8 runes
+// Check to ensure the byte slice only contains printable UTF-8 runes
 func ValidatePrintableRunes(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
@@ -54,14 +49,30 @@ func ValidatePrintableRunes(p []byte) bool {
 	return true
 }
 
-func ValidateLowAlphabet(b []byte) bool {
-	if utf8.Valid(b) {
-		for _, r := range b {
-			if bytes.IndexByte(loAlphabet, r) == -1 {
+// Check to ensure the byte slice only contains lowercase UTF-8 runes
+func ValidateLowAlphabet(p []byte) bool {
+	// Borrowed from utf.Valid() with added checks for printable runes
+	for i := 0; i < len(p); {
+		if p[i] < utf8.RuneSelf {
+			// Check if this single byte run is a lower case letter 
+			if !unicode.IsLower(rune(p[i])) {
 				return false
 			}
+			i++
+		} else {
+			r, size := utf8.DecodeRune(p[i:])
+			if size == 1 {
+				// All valid runes of size 1 (those
+				// below RuneSelf) were handled above.
+				// This must be a RuneError.
+				return false
+			}
+			// Check if this multi-byte rune is printable
+			if !unicode.IsPrint(r) {
+				return false
+			}
+			i += size
 		}
-		return true
 	}
-	return false
+	return true
 }
