@@ -4,83 +4,83 @@ import (
 	"testing"
 )
 
-func Benchmark_ValidateLowAlphabet_1(b *testing.B) {
+func Benchmark_IsLower_1(b *testing.B) {
 	b.StopTimer()
 	by := []byte("abcdefghijklmnopqrstuvwxyz")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet(by)
+		IsLower(by)
 	}
 }
 
-func Benchmark_ValidateLowAlphabet_2(b *testing.B) {
+func Benchmark_IsLower_2(b *testing.B) {
 	b.StopTimer()
 	by := []byte("howimetyourmotherisagreatshow")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet(by)
+		IsLower(by)
 	}
 }
 
-func Benchmark_ValidateLowAlphabet_3(b *testing.B) {
+func Benchmark_IsLower_3(b *testing.B) {
 	b.StopTimer()
 	by := []byte("openupmyphoneanditsallwetinside")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet(by)
+		IsLower(by)
 	}
 }
 
-func Benchmark_ValidateUpAlphabet_1(b *testing.B) {
+func Benchmark_IsUpper_1(b *testing.B) {
 	b.StopTimer()
 	by := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateUpAlphabet(by)
+		IsUpper(by)
 	}
 }
 
-func Benchmark_ValidateUpAlphabet_2(b *testing.B) {
+func Benchmark_IsUpper_2(b *testing.B) {
 	b.StopTimer()
 	by := []byte("HOWIMETYOURMOTHERISAGREATSHOW")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateUpAlphabet(by)
+		IsUpper(by)
 	}
 }
 
-func Benchmark_ValidateUpAlphabet_3(b *testing.B) {
+func Benchmark_IsUpper_3(b *testing.B) {
 	b.StopTimer()
 	by := []byte("OPENUPMYPHONEANDITSALLWETINSIDE")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateUpAlphabet(by)
+		IsUpper(by)
 	}
 }
 
-func Benchmark_ValidatePrintableRunes_1(b *testing.B) {
+func Benchmark_IsPrint_1(b *testing.B) {
 	b.StopTimer()
 	by := []byte("abcdefghijklmnopqrstuvwxyz")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidatePrintableRunes(by)
+		IsPrint(by)
 	}
 }
 
-func Benchmark_ValidatePrintableRunes_2(b *testing.B) {
+func Benchmark_IsPrint_2(b *testing.B) {
 	b.StopTimer()
 	by := []byte("howimetyourmotherisagreatshow")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidatePrintableRunes(by)
+		IsPrint(by)
 	}
 }
 
-func Benchmark_ValidatePrintableRunes_3(b *testing.B) {
+func Benchmark_IsPrint_3(b *testing.B) {
 	b.StopTimer()
 	by := []byte("openupmyphoneanditsallwetinside")
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidatePrintableRunes(by)
+		IsPrint(by)
 	}
 }

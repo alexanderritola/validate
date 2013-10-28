@@ -24,7 +24,7 @@ var (
 )
 
 // Check to ensure the byte slice only contains printable UTF-8 runes
-func ValidatePrintableRunes(p []byte) bool {
+func IsPrint(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
@@ -52,7 +52,7 @@ func ValidatePrintableRunes(p []byte) bool {
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes
-func ValidateLowAlphabet(p []byte) bool {
+func IsLower(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
@@ -67,7 +67,7 @@ func ValidateLowAlphabet(p []byte) bool {
 }
 
 // Check to ensure the byte slice only contains upper case UTF-8 runes
-func ValidateUpAlphabet(p []byte) bool {
+func IsUpper(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for upper case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
