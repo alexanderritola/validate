@@ -2,6 +2,7 @@ package validate
 
 import (
 	"unicode/utf8"
+	"bytes"
 )
 
 var (
@@ -11,47 +12,25 @@ var (
 )
 
 func ValidateLowAlphabet(b []byte) bool {
-	match := 0
 	if utf8.Valid(b) {
-		for i, _  := range b {
-			for ii, _ := range loAlphabet {
-				if b[i] == loAlphabet[ii] {
-					match += 1
-					break
-				}
-			}
-			if match != (i+1) {
-				break
-			} else {
-				continue
-			}
+		for _, r  := range b {
+			if bytes.IndexByte(loAlphabet, r) == -1 {
+				return false
+			} 
 		}
-	}
-	if len(b) == match {
 		return true
 	}
 	return false
 }
-/*
+
 func ValidateLowAlphabet_2(b []byte) bool {
 	if utf8.Valid(b) {
-		for i, r  := range s {
-			for ii, _ := range loAlphabet {
-				if b[i] == loAlphabet[ii] {
-					match += 1
-					break
-				}
-			}
-			if match != (i+1) {
-				break
-			} else {
-				continue
-			}
+		for _, r  := range b {
+			if bytes.IndexByte(loAlphabet, r) == -1 {
+				return false
+			} 
 		}
-	}
-	if len(b) == match {
 		return true
 	}
 	return false
 }
-*/
