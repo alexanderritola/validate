@@ -49,29 +49,31 @@ func ValidatePrintableRunes(p []byte) bool {
 	return true
 }
 
-// Check to ensure the byte slice only contains lowercase UTF-8 runes
+// Check to ensure the byte slice only contains lower case UTF-8 runes
 func ValidateLowAlphabet(p []byte) bool {
-	// Borrowed from utf.Valid() with added checks for printable runes
+	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
-			// Check if this single byte run is a lower case letter 
+			// Check if this single byte run is a lower case rune 
 			if !unicode.IsLower(rune(p[i])) {
 				return false
 			}
 			i++
-		} else {
-			r, size := utf8.DecodeRune(p[i:])
-			if size == 1 {
-				// All valid runes of size 1 (those
-				// below RuneSelf) were handled above.
-				// This must be a RuneError.
+		}
+	}
+	return true
+}
+
+// Check to ensure the byte slice only contains upper case UTF-8 runes
+func ValidateUpAlphabet(p []byte) bool {
+	// Borrowed from utf.Valid() with added checks for upper case runes
+	for i := 0; i < len(p); {
+		if p[i] < utf8.RuneSelf {
+			// Check if this single byte run is a upper case rune 
+			if !unicode.IsUpper(rune(p[i])) {
 				return false
 			}
-			// Check if this multi-byte rune is printable
-			if !unicode.IsPrint(r) {
-				return false
-			}
-			i += size
+			i++
 		}
 	}
 	return true
