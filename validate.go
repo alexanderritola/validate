@@ -8,8 +8,12 @@ import (
 
 var (
 	//	loAlphabet = []byte("abcdefghijklmnopqrstuvwxyz") // Slower than below
-	loAlphabet = []byte("eitsanhurdmwgvlfbkopjxczyq") // UTF-8 lowercase characters in common order
-//	upAlphabet = []byte("EITSANHURDMWGVLFBKOPJXCZYQ") // UTF-8 uppercase characters in common order
+
+	// UTF-8 lowercase characters in common order
+	loAlphabet = []byte("eitsanhurdmwgvlfbkopjxczyq")
+
+	// UTF-8 uppercase characters in common order
+	//	upAlphabet = []byte("EITSANHURDMWGVLFBKOPJXCZYQ")
 )
 
 func ValidateLowAlphabet(b []byte) bool {
@@ -28,6 +32,7 @@ func ValidatePrintableRunes(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
+			// Check if this single byte run is printable
 			if !unicode.IsPrint(rune(p[i])) {
 				return false
 			}
@@ -40,6 +45,7 @@ func ValidatePrintableRunes(p []byte) bool {
 				// This must be a RuneError.
 				return false
 			}
+			// Check if this multi-byte rune is printable
 			if !unicode.IsPrint(r) {
 				return false
 			}
