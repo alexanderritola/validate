@@ -6,6 +6,16 @@ import (
 	"unicode/utf8"
 )
 
+// ErrorLevel specifies what type of validation error was encountered
+type ErrorLevel int
+
+// Error levels
+const (
+	NoError  = iota // No error was found
+	Format          // Data did not match the formatting requirements
+	Critical        // Data contained control or non-printable characters
+)
+
 var (
 	//	loAlphabet = []byte("abcdefghijklmnopqrstuvwxyz") // Slower than below
 
@@ -16,18 +26,7 @@ var (
 	//	upAlphabet = []byte("EITSANHURDMWGVLFBKOPJXCZYQ")
 )
 
-func ValidateLowAlphabet(b []byte) bool {
-	if utf8.Valid(b) {
-		for _, r := range b {
-			if bytes.IndexByte(loAlphabet, r) == -1 {
-				return false
-			}
-		}
-		return true
-	}
-	return false
-}
-
+// Check to ensure the byte slice only contains printable utf8 runes
 func ValidatePrintableRunes(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
@@ -53,4 +52,16 @@ func ValidatePrintableRunes(p []byte) bool {
 		}
 	}
 	return true
+}
+
+func ValidateLowAlphabet(b []byte) bool {
+	if utf8.Valid(b) {
+		for _, r := range b {
+			if bytes.IndexByte(loAlphabet, r) == -1 {
+				return false
+			}
+		}
+		return true
+	}
+	return false
 }
