@@ -5,7 +5,8 @@ import (
 )
 
 func Test_ValidateLowAlphabet_1(t *testing.T) {
-	if (ValidateLowAlphabet("goiscool") != true) {
+	s := "goiscool"
+	if (ValidateLowAlphabet([]byte(s)) != true) {
 		t.Error("Failed")
 	} else {
 		t.Log("Passed")
@@ -13,7 +14,8 @@ func Test_ValidateLowAlphabet_1(t *testing.T) {
 }
 
 func Test_ValidateLowAlphabet_2(t *testing.T) {
-	if (ValidateLowAlphabet("goiscoolandshit") != true) {
+	s := "goiscoolandshit"
+	if (ValidateLowAlphabet([]byte(s)) != true) {
 		t.Error("Failed")
 	} else {
 		t.Log("Passed")

@@ -5,19 +5,28 @@ import (
 )
 
 func Benchmark_ValidateLowAlphabet_1(b *testing.B) {
+	b.StopTimer()
+	by := []byte("goissocool")
+	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet("goissocool")
+		ValidateLowAlphabet(by)
 	}
 }
 
 func Benchmark_ValidateLowAlphabet_2(b *testing.B) {
+	b.StopTimer()
+	by := []byte("howimetyourmotherisagreatshow")
+	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet("howimetyourmotherisagreatshow")
+		ValidateLowAlphabet(by)
 	}
 }
 
 func Benchmark_ValidateLowAlphabet_3(b *testing.B) {
+	b.StopTimer()
+	by := []byte("openupmyphoneanditsallwetinside")
+	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		ValidateLowAlphabet("openupmyphoneanditsallwetinside")
+		ValidateLowAlphabet(by)
 	}
 }
