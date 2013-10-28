@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	Format 		= errors.New("validate: Data did not match the formatting requirements")
-	Critical	= errors.New("validate: Data contained control or non-printable characters")
+	Format = errors.New(
+		"validate: Data did not match the formatting requirements")
+	Critical = errors.New(
+		"validate: Data contained control or non-printable characters")
 )
 
 var (
@@ -54,7 +56,7 @@ func ValidateLowAlphabet(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
-			// Check if this single byte run is a lower case rune 
+			// Check if this single byte run is a lower case rune
 			if !unicode.IsLower(rune(p[i])) {
 				return false
 			}
@@ -69,7 +71,7 @@ func ValidateUpAlphabet(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for upper case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
-			// Check if this single byte run is a upper case rune 
+			// Check if this single byte run is a upper case rune
 			if !unicode.IsUpper(rune(p[i])) {
 				return false
 			}
