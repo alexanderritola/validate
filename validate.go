@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	Format 		= errors.New("validate: Data did not match the formatting requirements")
-	Critical	= errors.New("validate: Data contained control or non-printable characters")
+	Format = errors.New(
+		"validate: Data did not match the formatting requirements")
+	Critical = errors.New(
+		"validate: Data contained control or non-printable characters")
 )
 
 var (
@@ -22,7 +24,7 @@ var (
 )
 
 // Check to ensure the byte slice only contains printable UTF-8 runes
-func ValidatePrintableRunes(p []byte) bool {
+func IsPrint(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
@@ -50,11 +52,11 @@ func ValidatePrintableRunes(p []byte) bool {
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes
-func ValidateLowAlphabet(p []byte) bool {
+func IsLower(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
-			// Check if this single byte run is a lower case rune 
+			// Check if this single byte run is a lower case rune
 			if !unicode.IsLower(rune(p[i])) {
 				return false
 			}
@@ -65,11 +67,11 @@ func ValidateLowAlphabet(p []byte) bool {
 }
 
 // Check to ensure the byte slice only contains upper case UTF-8 runes
-func ValidateUpAlphabet(p []byte) bool {
+func IsUpper(p []byte) bool {
 	// Borrowed from utf.Valid() with added checks for upper case runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
-			// Check if this single byte run is a upper case rune 
+			// Check if this single byte run is a upper case rune
 			if !unicode.IsUpper(rune(p[i])) {
 				return false
 			}
