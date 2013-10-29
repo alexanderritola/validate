@@ -2,57 +2,57 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"unicode"
 	"unicode/utf8"
 )
 
-//
+// Validator validates Methods
 type Validator struct {
 	NonLatin bool // Use only Latin characters by default
 }
 
-func (v *Validator) Validate(m Method) (r *Result) {
+// Validate the given method
+func (v *Validator) Validate(m *Method) (e *Error) {
 	return
 }
 
 // Defines a specific validation method
 type Method interface {
 	// Run the validation check on the method
-	Validate(*Validator) *Result
+	Validate(*Validator) *Error
+
+	// Set the message to be returned on validation failure
+	Message(string) *Method
 }
 
-// Sets the error message if the validation failed.
-func (r *Result) Message(message string, args ...interface{}) *Result {
-	if !r.OK {
-		r.Error.Error = errors.New(message)
-	}
-	return r
-}
-
-// Results of validating the data
-type Result struct {
-	OK    bool
-	Error Error
-}
-
-// Results error
+// Validation error
 type Error struct {
-	Level int
-	Error error
+	Level   ErrorLevel
+	Message error
 }
+
+// I think I need to improve this type but it works for now
+func (e *Error) Error() string {
+	return fmt.Sprintf("%s", e.Message)
+}
+
+// Validation error level.
+type ErrorLevel int
+
+const (
+	// Data did not pass validation formatting requirements
+	ErrInvalid = iota + 1
+
+	// Data contained invalid characters
+	ErrInvalidChars
+)
 
 var (
-	// Validation was completed successfully
-	OK = &Result{
-		OK: true,
-	}
-
 	// Invalid UTF8 characters were encountered
-	ErrInvalidUTF8 = &Result{
-		Error: Error{
-			Level: 2,
-			Error: Critical,
-		},
+	ErrInvalidUTF8 = &Error{
+		Level:   ErrInvalidChars,
+		Message: Critical,
 	}
 )
 

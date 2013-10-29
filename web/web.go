@@ -10,12 +10,20 @@ import (
 
 // A domain name
 type Domain struct {
-	domain []byte
+	domain  []byte
+	message string
 }
 
 // Create a new domain value to be validated
-func NewDomain(d []byte) *Domain {
-	return &Domain{d}
+func NewDomain(domain string) *Domain {
+	return &Domain{domain: []byte(domain)}
+}
+
+// Sets the validation failure message.
+func (d *Domain) Message(msg string) *validate.Method {
+	d.message = msg
+	v := validate.Method(d)
+	return &v
 }
 
 // Validate a domain
@@ -23,11 +31,11 @@ func exampleValidation() {
 	// Setup a new validator
 	v := validate.Validator{}
 
-	// Create a new Domain object
-	d := NewDomain([]byte("lol.com"))
+	// Create a new Domain object and return the message on failure
+	d := NewDomain("lol.com").Message("Invalid domain format")
 
-	result := v.Validate(d).Message("Invalid domain format")
-	if !result.OK {
+	err := v.Validate(d)
+	if err != nil {
 		// Validation failed
 	}
 }
@@ -46,7 +54,7 @@ var (
 )
 
 // Checks for a valid domain name
-func (d Domain) Validate(v *validate.Validator) (res *validate.Result) {
+func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
 	// - 253 character total length max
@@ -135,7 +143,7 @@ func (d Domain) Validate(v *validate.Validator) (res *validate.Result) {
 	// We have all valid unicode characters, now make sure the TLD is real.
 	domainTLD := domain[len(domain)-1]
 	if tld.Valid(domainTLD) {
-		return validate.OK
+		return nil
 	}
 
 	// Not sure how we got here, but lets return false just in case.
