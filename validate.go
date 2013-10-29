@@ -6,6 +6,40 @@ import (
 	"unicode/utf8"
 )
 
+//
+type Validator struct {
+	NonLatin bool // Use only Latin characters by default
+}
+
+// Defines a specific validation method
+type Method interface {
+	// Run the validation check on the method
+	Validate() Result
+}
+
+// Results of validating the data
+type Result struct {
+	OK    bool
+	Error Error
+}
+
+type Error struct {
+	Level int
+	Error error
+}
+
+var (
+	OK = &Result{
+		OK: true,
+	}
+	ErrInvalidUTF8 = &Result{
+		Error: Error{
+			Level: 2,
+			Error: Critical,
+		},
+	}
+)
+
 var (
 	Format = errors.New(
 		"validate: Data did not match the formatting requirements")

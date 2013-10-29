@@ -2,10 +2,14 @@ package web
 
 import (
 	"bytes"
+	"github.com/daswasser/validate"
 	"github.com/inhies/go-tld"
 	"unicode"
 	"unicode/utf8"
 )
+
+// A domain name
+type Domain []byte
 
 var (
 	// A-Z, a-z, 0-9, and hyphen
@@ -21,7 +25,8 @@ var (
 )
 
 // Checks for a valid domain name
-func IsDomain(p []byte) bool {
+func (d Domain) Validate() (res *validate.Result) {
+	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
 	// - 253 character total length max
 	// - 63 character label max
@@ -33,8 +38,9 @@ func IsDomain(p []byte) bool {
 	// Check for max length.
 	// NOTE: Invalid unicode will count as a 1 byte rune, but we'll catch that
 	// later.
+	p := d
 	if utf8.RuneCount(p) > 252 {
-		return false
+		return
 	}
 
 	// First we split by label
@@ -42,7 +48,7 @@ func IsDomain(p []byte) bool {
 
 	// 127 sub-domains max (not including TLD)
 	if len(domain) > 127 {
-		return false
+		return
 	}
 
 	// Check each domain for valid characters
@@ -50,33 +56,33 @@ func IsDomain(p []byte) bool {
 		length := len(subDomain)
 		// Check for a domain with two periods next to eachother.
 		if length < 1 {
-			return false
+			return
 		}
 
 		// Check 63 character max.
 		if length > 62 {
-			return false
+			return
 		}
 
 		// Check that label doesn't start or end with hyphen.
 		r, size := utf8.DecodeRune(subDomain)
 		if r == utf8.RuneError && size == 1 {
 			// Invalid rune
-			return false
+			return validate.ErrInvalidUTF8
 		}
 
 		if r == '-' {
-			return false
+			return
 		}
 
 		r, size = utf8.DecodeLastRune(subDomain)
 		if r == utf8.RuneError && size == 1 {
 			// Invalid rune
-			return false
+			return validate.ErrInvalidUTF8
 		}
 
 		if r == '-' {
-			return false
+			return
 		}
 
 		// Now we check each rune individually to make sure its valid unicode
@@ -85,7 +91,7 @@ func IsDomain(p []byte) bool {
 			if subDomain[i] < utf8.RuneSelf {
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, rune(subDomain[i])) {
-					return false
+					return
 				}
 				i++
 			} else {
@@ -94,11 +100,11 @@ func IsDomain(p []byte) bool {
 					// All valid runes of size 1 (those
 					// below RuneSelf) were handled above.
 					// This must be a RuneError.
-					return false
+					return validate.ErrInvalidUTF8
 				}
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, r) {
-					return false
+					return
 				}
 				i += size
 			}
@@ -108,9 +114,9 @@ func IsDomain(p []byte) bool {
 	// We have all valid unicode characters, now make sure the TLD is real.
 	domainTLD := domain[len(domain)-1]
 	if tld.Valid(domainTLD) {
-		return true
+		return validate.OK
 	}
 
 	// Not sure how we got here, but lets return false just in case.
-	return false
+	return
 }
