@@ -9,7 +9,28 @@ import (
 )
 
 // A domain name
-type Domain []byte
+type Domain struct {
+	domain []byte
+}
+
+// Create a new domain value to be validated
+func NewDomain(d []byte) *Domain {
+	return &Domain{d}
+}
+
+// Validate a domain
+func exampleValidation() {
+	// Setup a new validator
+	v := validate.Validator{}
+
+	// Create a new Domain object
+	d := NewDomain([]byte("lol.com"))
+
+	result := v.Validate(d).Message("Invalid domain format")
+	if !result.OK {
+		// Validation failed
+	}
+}
 
 var (
 	// A-Z, a-z, 0-9, and hyphen
@@ -25,7 +46,7 @@ var (
 )
 
 // Checks for a valid domain name
-func (d Domain) Validate() (res *validate.Result) {
+func (d Domain) Validate(v *validate.Validator) (res *validate.Result) {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
 	// - 253 character total length max
@@ -38,7 +59,7 @@ func (d Domain) Validate() (res *validate.Result) {
 	// Check for max length.
 	// NOTE: Invalid unicode will count as a 1 byte rune, but we'll catch that
 	// later.
-	p := d
+	p := d.domain
 	if utf8.RuneCount(p) > 252 {
 		return
 	}

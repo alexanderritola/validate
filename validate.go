@@ -11,10 +11,22 @@ type Validator struct {
 	NonLatin bool // Use only Latin characters by default
 }
 
+func (v *Validator) Validate(m Method) (r *Result) {
+	return
+}
+
 // Defines a specific validation method
 type Method interface {
 	// Run the validation check on the method
-	Validate() Result
+	Validate(*Validator) *Result
+}
+
+// Sets the error message if the validation failed.
+func (r *Result) Message(message string, args ...interface{}) *Result {
+	if !r.OK {
+		r.Error.Error = errors.New(message)
+	}
+	return r
 }
 
 // Results of validating the data
@@ -23,15 +35,19 @@ type Result struct {
 	Error Error
 }
 
+// Results error
 type Error struct {
 	Level int
 	Error error
 }
 
 var (
+	// Validation was completed successfully
 	OK = &Result{
 		OK: true,
 	}
+
+	// Invalid UTF8 characters were encountered
 	ErrInvalidUTF8 = &Result{
 		Error: Error{
 			Level: 2,
