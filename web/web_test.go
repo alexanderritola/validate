@@ -49,6 +49,7 @@ var domainTests = []struct {
 	{"code.google.com", true},
 	{"code.google..com", false},
 	{".com", false},
+	{"com", true},
 	{"one.2.three.4.com", true},
 	{"invalid.bit", false},
 }
