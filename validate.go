@@ -13,8 +13,8 @@ type Validator struct {
 }
 
 // Validate the given method
-func (v *Validator) Validate(m *Method) (e *Error) {
-	return
+func (v *Validator) Validate(m Method) (e *Error) {
+	return m.Validate(v)
 }
 
 // Defines a specific validation method
@@ -23,7 +23,7 @@ type Method interface {
 	Validate(*Validator) *Error
 
 	// Set the message to be returned on validation failure
-	Message(string) *Method
+	//Message(string) *Method
 }
 
 // Validation error

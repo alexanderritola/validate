@@ -2,6 +2,7 @@ package web
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/daswasser/validate"
 	"github.com/inhies/go-tld"
 	"unicode"
@@ -16,14 +17,14 @@ type Domain struct {
 
 // Create a new domain value to be validated
 func NewDomain(domain string) *Domain {
-	return &Domain{domain: []byte(domain)}
+	d := Domain{domain: []byte(domain)}
+	return &d
 }
 
 // Sets the validation failure message.
-func (d *Domain) Message(msg string) *validate.Method {
+func (d *Domain) Message(msg string) *Domain {
 	d.message = msg
-	v := validate.Method(d)
-	return &v
+	return d
 }
 
 // Validate a domain
@@ -54,7 +55,7 @@ var (
 )
 
 // Checks for a valid domain name
-func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
+func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
 	// - 253 character total length max
@@ -69,7 +70,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 	// later.
 	p := d.domain
 	if utf8.RuneCount(p) > 252 {
-		return
+		return validate.ErrInvalidUTF8
 	}
 
 	// First we split by label
@@ -77,7 +78,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 
 	// 127 sub-domains max (not including TLD)
 	if len(domain) > 127 {
-		return
+		return validate.ErrInvalidUTF8
 	}
 
 	// Check each domain for valid characters
@@ -85,12 +86,13 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 		length := len(subDomain)
 		// Check for a domain with two periods next to eachother.
 		if length < 1 {
-			return
+			fmt.Println(string(subDomain))
+			return validate.ErrInvalidUTF8
 		}
 
 		// Check 63 character max.
 		if length > 62 {
-			return
+			return validate.ErrInvalidUTF8
 		}
 
 		// Check that label doesn't start or end with hyphen.
@@ -101,7 +103,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 		}
 
 		if r == '-' {
-			return
+			return validate.ErrInvalidUTF8
 		}
 
 		r, size = utf8.DecodeLastRune(subDomain)
@@ -111,7 +113,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 		}
 
 		if r == '-' {
-			return
+			return validate.ErrInvalidUTF8
 		}
 
 		// Now we check each rune individually to make sure its valid unicode
@@ -120,7 +122,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 			if subDomain[i] < utf8.RuneSelf {
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, rune(subDomain[i])) {
-					return
+					return validate.ErrInvalidUTF8
 				}
 				i++
 			} else {
@@ -133,7 +135,7 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 				}
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, r) {
-					return
+					return validate.ErrInvalidUTF8
 				}
 				i += size
 			}
@@ -147,5 +149,5 @@ func (d Domain) Validate(v *validate.Validator) (err *validate.Error) {
 	}
 
 	// Not sure how we got here, but lets return false just in case.
-	return
+	return validate.ErrInvalidUTF8
 }

@@ -1,29 +1,34 @@
 package web
 
 import (
+	"github.com/daswasser/validate"
 	"testing"
 )
 
 var domainTests = []struct {
-	Domain []byte
+	Domain string
 	Valid  bool
 }{
-	{[]byte("code.google.com"), true},
-	{[]byte("code.google..com"), false},
-	{[]byte(".com"), false},
-	{[]byte("one.2.three.4.com"), true},
-	{[]byte("invalid.bit"), false},
+	{"code.google.com", true},
+	{"code.google..com", false},
+	{".com", false},
+	{"one.2.three.4.com", true},
+	{"invalid.bit", false},
 }
 
 func Test_Domain_1(t *testing.T) {
+	v := validate.Validator{}
 	for i, d := range domainTests {
-		if v := IsDomain(d.Domain); v != d.Valid {
-			t.Errorf("%d. IsDomain(\"%s\") returned %v, want %v",
-				i, d.Domain, v, d.Valid)
+		domain := NewDomain(d.Domain)
+		err := v.Validate(domain)
+		if (err != nil && d.Valid) || (err == nil && !d.Valid) {
+			t.Errorf("%d. IsValid(\"%s\") returned %v, want %v. Error: %v",
+				i, d.Domain, err != nil, d.Valid, err)
 		}
 	}
 }
 
+/*
 func Benchmark_Domain_1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		for _, d := range domainTests {
@@ -31,3 +36,4 @@ func Benchmark_Domain_1(b *testing.B) {
 		}
 	}
 }
+*/
