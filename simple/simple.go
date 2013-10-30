@@ -1,6 +1,7 @@
 package simple
 
 import (
+	"github.com/daswasser/validate"
 	"unicode"
 	"unicode/utf8"
 )
@@ -22,6 +23,7 @@ type Printable struct {
 
 // Check to ensure the byte slice only contains printable UTF-8 runes
 func (m *Printable) Validate(v *validate.Validator) *validate.Error {
+	p := m.data
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
