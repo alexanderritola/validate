@@ -22,14 +22,9 @@ type Domain struct {
 	message string
 }
 
-// Returns the domain
+// Return the domain
 func (d *Domain) String() string {
 	return string(d.domain)
-}
-
-// Returns the failed validation message
-func (d *Domain) Error() string {
-	return d.message
 }
 
 // Create a new domain value to be validated
@@ -56,7 +51,6 @@ var (
 		LatinOffset: 4,
 	}
 )
-
 var (
 	// Entire domain or a single label has an invalid length.
 	ErrDomainLength = &validate.Error{
