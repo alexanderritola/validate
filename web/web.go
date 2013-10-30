@@ -73,7 +73,7 @@ var (
 
 // Checks for a valid domain name. Checks lengths, characters, and looks for a
 // valid TLD (according to IANA).
-func (d *Domain) Validate(v *validate.Validator) *validate.Error {
+func (d *Domain) Validate(v validate.Validator) *validate.Error {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
 	// - 253 character total length max
