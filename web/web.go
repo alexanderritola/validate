@@ -1,18 +1,35 @@
+// Package validate/web provides functions for validaing web data types such as
+// URLs, domains, email addresses, etc.
 package web
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"github.com/daswasser/validate"
 	"github.com/inhies/go-tld"
 	"unicode"
 	"unicode/utf8"
 )
 
-// A domain name
+var (
+	IANA = tld.IANA  // URL of the default TLD list.
+	TLDs = &tld.TLDs // Pointer to the tld packages URL slice.
+)
+
+// A domain value to be validated
 type Domain struct {
 	domain  []byte
 	message string
+}
+
+// Returns the domain
+func (d *Domain) String() string {
+	return string(d.domain)
+}
+
+// Returns the failed validation message
+func (d *Domain) Error() string {
+	return d.message
 }
 
 // Create a new domain value to be validated
@@ -27,22 +44,8 @@ func (d *Domain) Message(msg string) *Domain {
 	return d
 }
 
-// Validate a domain
-func exampleValidation() {
-	// Setup a new validator
-	v := validate.Validator{}
-
-	// Create a new Domain object and return the message on failure
-	d := NewDomain("lol.com").Message("Invalid domain format")
-
-	err := v.Validate(d)
-	if err != nil {
-		// Validation failed
-	}
-}
-
 var (
-	// A-Z, a-z, 0-9, and hyphen
+	// A-Z, a-z, 0-9, and hyphen are the only valid characters for domains.
 	domainTable = &unicode.RangeTable{
 		R16: []unicode.Range16{
 			{'-', '-', 1},
@@ -53,8 +56,28 @@ var (
 		LatinOffset: 4,
 	}
 )
+var (
+	// Entire domain or a single label has an invalid length.
+	ErrDomainLength = &validate.Error{
+		Level:   validate.ErrInvalid,
+		Message: errors.New("Invalid length"),
+	}
 
-// Checks for a valid domain name
+	// Invalid characters or punctuation.
+	ErrFormatting = &validate.Error{
+		Level:   validate.ErrInvalid,
+		Message: errors.New("Invalid formatting"),
+	}
+
+	// Unknown error, probably really bad.
+	ErrUnknown = &validate.Error{
+		Level:   2,
+		Message: errors.New("Unknown error"),
+	}
+)
+
+// Checks for a valid domain name. Checks lengths, characters, and looks for a
+// valid TLD (according to IANA).
 func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
@@ -70,7 +93,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 	// later.
 	p := d.domain
 	if utf8.RuneCount(p) > 252 {
-		return validate.ErrInvalidUTF8
+		return ErrDomainLength
 	}
 
 	// First we split by label
@@ -78,7 +101,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 
 	// 127 sub-domains max (not including TLD)
 	if len(domain) > 127 {
-		return validate.ErrInvalidUTF8
+		return ErrDomainLength
 	}
 
 	// Check each domain for valid characters
@@ -86,13 +109,12 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 		length := len(subDomain)
 		// Check for a domain with two periods next to eachother.
 		if length < 1 {
-			fmt.Println(string(subDomain))
-			return validate.ErrInvalidUTF8
+			return ErrFormatting
 		}
 
 		// Check 63 character max.
 		if length > 62 {
-			return validate.ErrInvalidUTF8
+			return ErrDomainLength
 		}
 
 		// Check that label doesn't start or end with hyphen.
@@ -103,7 +125,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 		}
 
 		if r == '-' {
-			return validate.ErrInvalidUTF8
+			return ErrFormatting
 		}
 
 		r, size = utf8.DecodeLastRune(subDomain)
@@ -113,7 +135,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 		}
 
 		if r == '-' {
-			return validate.ErrInvalidUTF8
+			return ErrFormatting
 		}
 
 		// Now we check each rune individually to make sure its valid unicode
@@ -122,7 +144,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 			if subDomain[i] < utf8.RuneSelf {
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, rune(subDomain[i])) {
-					return validate.ErrInvalidUTF8
+					return ErrFormatting
 				}
 				i++
 			} else {
@@ -135,7 +157,7 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 				}
 				// Check if it's a valid domain character
 				if !unicode.Is(domainTable, r) {
-					return validate.ErrInvalidUTF8
+					return ErrFormatting
 				}
 				i += size
 			}
@@ -149,5 +171,11 @@ func (d *Domain) Validate(v *validate.Validator) *validate.Error {
 	}
 
 	// Not sure how we got here, but lets return false just in case.
-	return validate.ErrInvalidUTF8
+	return ErrUnknown
+}
+
+// Update the included list of TLDs from the given URL.
+// Uses github.com/inhies/go-tld
+func UpdateTLDs(url string) (err error) {
+	return tld.Update(url)
 }

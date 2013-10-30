@@ -1,9 +1,46 @@
 package web
 
 import (
+	"fmt"
 	"github.com/daswasser/validate"
 	"testing"
 )
+
+func ExampleDomain_Validate() {
+	// Setup a new validator
+	v := validate.Validator{}
+
+	// Create a new Domain object and return the message on failure
+	goodDomain :=
+		NewDomain("www.golang.org").Message("Invalid domain specified!")
+
+	badDomain :=
+		NewDomain("gophersRock!com").Message("Invalid domain specified!")
+
+	// Validate the good domain
+	err := v.Validate(goodDomain)
+	if err != nil {
+		fmt.Printf("%s error:\n", goodDomain)
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s is a valid domain\n", goodDomain)
+	}
+
+	// Validate the bad domain
+	err = v.Validate(badDomain)
+	if err != nil {
+		fmt.Printf("%s error:\n", badDomain)
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s is a valid domain\n", badDomain)
+	}
+
+	// Output:
+	// www.golang.org is a valid domain
+	// gophersRock!com error:
+	// Error level 1: Invalid formatting
+
+}
 
 var domainTests = []struct {
 	Domain string

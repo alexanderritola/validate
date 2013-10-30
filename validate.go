@@ -1,3 +1,6 @@
+// Package validate provides core functions for validating data using modular
+// validation methods from outside packages with support for failed validation
+// severity levels.
 package validate
 
 import (
@@ -19,25 +22,21 @@ func (v *Validator) Validate(m Method) (e *Error) {
 
 // Defines a specific validation method
 type Method interface {
-	// Run the validation check on the method
-	Validate(*Validator) *Error
-
-	// Set the message to be returned on validation failure
-	//Message(string) *Method
+	Validate(*Validator) *Error // Run the validation check on the method
 }
 
 // Validation error
 type Error struct {
-	Level   ErrorLevel
-	Message error
+	Level   ErrorLevel // Error severity level
+	Message error      // Error message
 }
 
-// I think I need to improve this type but it works for now
+// Returns the string representation of the error level and message
 func (e *Error) Error() string {
-	return fmt.Sprintf("%s", e.Message)
+	return fmt.Sprintf("Error level %v: %s", e.Level, e.Message)
 }
 
-// Validation error level.
+// Validation error level. Higher levels are more severe.
 type ErrorLevel int
 
 const (
@@ -49,7 +48,8 @@ const (
 )
 
 var (
-	// Invalid UTF8 characters were encountered
+	// Invalid UTF8 characters were encountered. This could indicate a malicious
+	// access attempt.
 	ErrInvalidUTF8 = &Error{
 		Level:   ErrInvalidChars,
 		Message: Critical,
@@ -58,9 +58,9 @@ var (
 
 var (
 	Format = errors.New(
-		"validate: Data did not match the formatting requirements")
+		"Data did not meet the formatting requirements")
 	Critical = errors.New(
-		"validate: Data contained control or non-printable characters")
+		"Data contained control or non-printable characters")
 )
 
 var (
