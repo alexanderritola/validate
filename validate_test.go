@@ -4,9 +4,6 @@ import (
 	"testing"
 )
 
-func ExampleValidator_Validate() {
-
-}
 func Test_IsLower_1(t *testing.T) {
 	s := "goiscool"
 	if IsLower([]byte(s)) != true {

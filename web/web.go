@@ -56,6 +56,7 @@ var (
 		LatinOffset: 4,
 	}
 )
+
 var (
 	// Entire domain or a single label has an invalid length.
 	ErrDomainLength = &validate.Error{
