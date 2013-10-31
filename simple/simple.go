@@ -35,6 +35,15 @@ func NewPrintable(data []byte) *Printable {
 	return &Printable{data: data}
 }
 
+func (p *Printable) SetMessage(msg string) validate.Method {
+	p.message = msg
+	return p
+}
+
+func (p *Printable) Message() string {
+	return p.message
+}
+
 // Check to ensure the byte slice only contains printable UTF-8 runes
 func (m *Printable) Validate(v validate.Validator) *validate.Error {
 	p := m.data
@@ -76,6 +85,15 @@ type Lower struct {
 // Returns a new Lower value for the specified data.
 func NewLower(data []byte) *Lower {
 	return &Lower{data: data}
+}
+
+func (p *Lower) SetMessage(msg string) validate.Method {
+	p.message = msg
+	return p
+}
+
+func (p *Lower) Message() string {
+	return p.message
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes
@@ -120,6 +138,15 @@ type Upper struct {
 // Returns a new Upper  value for the specified data.
 func NewUpper(data []byte) *Upper {
 	return &Upper{data: data}
+}
+
+func (p *Upper) SetMessage(msg string) validate.Method {
+	p.message = msg
+	return p
+}
+
+func (p *Upper) Message() string {
+	return p.message
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes

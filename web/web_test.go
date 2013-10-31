@@ -12,16 +12,19 @@ func ExampleDomain_Validate() {
 
 	// Create a new Domain object and return the message on failure
 	goodDomain :=
-		NewDomain("www.golang.org").Message("Invalid domain specified!")
+		NewDomain("www.golang.org").
+			MaxSubdomains(2).
+			SetMessage("Invalid domain specified!")
 
 	badDomain :=
-		NewDomain("gophersRock!com").Message("Invalid domain specified!")
+		NewDomain("gophersRock!com").SetMessage("Invalid domain specified!")
 
 	// Validate the good domain
 	err := v.Validate(goodDomain)
 	if err != nil {
 		fmt.Printf("%s error:\n", goodDomain)
 		fmt.Println(err)
+		fmt.Println(goodDomain.Message())
 	} else {
 		fmt.Printf("%s is a valid domain\n", goodDomain)
 	}
@@ -31,6 +34,7 @@ func ExampleDomain_Validate() {
 	if err != nil {
 		fmt.Printf("%s error:\n", badDomain)
 		fmt.Println(err)
+		fmt.Println(badDomain.Message())
 	} else {
 		fmt.Printf("%s is a valid domain\n", badDomain)
 	}
@@ -39,7 +43,7 @@ func ExampleDomain_Validate() {
 	// www.golang.org is a valid domain
 	// gophersRock!com error:
 	// Error level 1: Invalid formatting
-
+	// Invalid domain specified!
 }
 
 var domainTests = []struct {
@@ -54,7 +58,7 @@ var domainTests = []struct {
 	{"invalid.bit", false},
 }
 
-func Test_Domain_1(t *testing.T) {
+func Test_Domain_Validate(t *testing.T) {
 	v := validate.NewValidator()
 	for i, d := range domainTests {
 		domain := NewDomain(d.Domain)
@@ -66,7 +70,7 @@ func Test_Domain_1(t *testing.T) {
 	}
 }
 
-func Benchmark_Domain_1(b *testing.B) {
+func Benchmark_Domain_Validate(b *testing.B) {
 	b.StopTimer()
 	v := validate.NewValidator()
 	b.StartTimer()

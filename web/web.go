@@ -20,6 +20,7 @@ var (
 type Domain struct {
 	domain  []byte
 	message string
+	checks  map[string]interface{}
 }
 
 // Return the domain
@@ -29,13 +30,27 @@ func (d *Domain) String() string {
 
 // Create a new domain value to be validated
 func NewDomain(domain string) *Domain {
-	d := Domain{domain: []byte(domain)}
+	d := Domain{
+		domain: []byte(domain),
+		checks: make(map[string]interface{}),
+	}
 	return &d
 }
 
 // Sets the validation failure message.
-func (d *Domain) Message(msg string) *Domain {
+func (d *Domain) SetMessage(msg string) validate.Method {
 	d.message = msg
+	return d
+}
+
+// Return the failed validation message.
+func (d *Domain) Message() string {
+	return d.message
+}
+
+// Specifies the maximum number of sub-domains to allow.
+func (d *Domain) MaxSubdomains(m int) *Domain {
+	d.checks["maxsubs"] = m
 	return d
 }
 
@@ -99,6 +114,9 @@ func (d *Domain) Validate(v validate.Validator) *validate.Error {
 		return ErrDomainLength
 	}
 
+	if d.checks["maxsubs"] != nil && len(domain) > d.checks["maxsubs"].(int)+1 {
+		return ErrDomainLength
+	}
 	// Check each domain for valid characters
 	for _, subDomain := range domain {
 		length := len(subDomain)
