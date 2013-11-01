@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"fmt"
 	"errors"
 	"unicode"
 	"unicode/utf8"
@@ -57,6 +58,7 @@ func IsLower(p []byte) bool {
 	for i := 0; i < len(p); {
 		if p[i] < utf8.RuneSelf {
 			// Check if this single byte run is a lower case rune
+			fmt.Println(uint32(p[i]))
 			if !unicode.IsLower(rune(p[i])) {
 				return false
 			}
