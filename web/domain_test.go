@@ -138,7 +138,7 @@ var tlds = []domainTest{
 	{"oursite.test123", true}, // Test for our TLD that we will add to the list.
 }
 
-// Test for the maximum number of sub domains.
+// Test validation when specifying our own TLD.
 func Test_Domain_Validate_AddTLD(t *testing.T) {
 	// Append the test123 TLD to the list.
 	*TLDs = append(*TLDs, []byte("test123"))
@@ -186,6 +186,7 @@ func Benchmark_Domain_ValidateLessSimple(b *testing.B) {
 func Benchmark_Domain_ValidateLongest(b *testing.B) {
 	benchmarkDomain_Validate(maxLength[0].Domain, b)
 }
+
 func Benchmark_Domain_ValidateMostSubs(b *testing.B) {
 	benchmarkDomain_Validate(maxSubDomains[0].Domain, b)
 }
