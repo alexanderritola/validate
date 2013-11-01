@@ -36,8 +36,7 @@ func Test_Domain_Validate_InvalidCharacters(t *testing.T) {
 // TLD to test for this otherwise its impossible to get 127 subdomains to
 // fit in 255 characters.
 var maxSubDomains = []domainTest{
-	{"a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.0.1.2.3.4.5.6.7.8.9.0.1.2.3.4.5.6.7.8.9.0.1.x.x", true}, // 127 sub-domains
-
+	{"a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.0.1.2.3.4.5.6.7.8.9.0.1.2.3.4.5.6.7.8.9.0.1.x.x", true},    // 127 sub-domains
 	{"a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.0.1.2.3.4.5.6.7.8.9.0.1.2.3.4.5.6.7.8.9.0.1.x.x.x", false}, // 128 sub-domains and length > 255
 }
 
@@ -76,16 +75,16 @@ func Test_Domain_Validate_MaxLength(t *testing.T) {
 	}
 }
 
-var customMaxSubs = []domainTest{
+var maxSubs = []domainTest{
 	{"a.com", true},
 	{"a.b.com", true},
 	{"a.b.c.com", false},
 }
 
 // Test for setting maximum number of sub domains.
-func Test_Domain_Validate_CustomMaxSubs(t *testing.T) {
+func Test_Domain_Validate_MaxSubs(t *testing.T) {
 	v := validate.NewValidator()
-	for i, d := range customMaxSubs {
+	for i, d := range maxSubs {
 		domain := NewDomain(d.Domain).MaxSubdomains(2)
 		err := v.Validate(domain)
 		if (err != nil && d.Valid) || (err == nil && !d.Valid) {
@@ -96,15 +95,15 @@ func Test_Domain_Validate_CustomMaxSubs(t *testing.T) {
 }
 
 // Set max length to 5
-var customMaxLength = []domainTest{
+var shorterMaxLength = []domainTest{
 	{"a.com", true},
 	{"ab.com", false},
 }
 
 // Test for setting custom domain max length.
-func Test_Domain_Validate_CustomMaxLength(t *testing.T) {
+func Test_Domain_Validate_ShorterMaxLength(t *testing.T) {
 	v := validate.NewValidator()
-	for i, d := range customMaxLength {
+	for i, d := range shorterMaxLength {
 		domain := NewDomain(d.Domain).MaxLength(5)
 		err := v.Validate(domain)
 		if (err != nil && d.Valid) || (err == nil && !d.Valid) {
@@ -180,7 +179,13 @@ func Benchmark_Domain_ValidateSimple(b *testing.B) {
 	benchmarkDomain_Validate("golang.org", b)
 }
 
+func Benchmark_Domain_ValidateLessSimple(b *testing.B) {
+	benchmarkDomain_Validate("www.golang.org", b)
+}
+
 func Benchmark_Domain_ValidateLongest(b *testing.B) {
-	benchmarkDomain_Validate(
-		"a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z.A.B.C.D.E.F.G.H.I.J.K.L.M.N.O.P.Q.R.S.T.U.V.W.X.Y.Z.0.1.2.3.4.5.6.7.8.9.0.1.2.3.4.5.6.7.8.9.0.1.com", b)
+	benchmarkDomain_Validate(maxLength[0].Domain, b)
+}
+func Benchmark_Domain_ValidateMostSubs(b *testing.B) {
+	benchmarkDomain_Validate(maxSubDomains[0].Domain, b)
 }
