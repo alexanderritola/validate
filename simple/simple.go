@@ -9,20 +9,10 @@ import (
 )
 
 var (
-	//	loAlphabet = []byte("abcdefghijklmnopqrstuvwxyz") // Slower than below
-
-	// UTF-8 lowercase characters in common order
-	loAlphabet = []byte("eitsanhurdmwgvlfbkopjxczyq")
-
-	// UTF-8 uppercase characters in common order
-	//	upAlphabet = []byte("EITSANHURDMWGVLFBKOPJXCZYQ")
-)
-
-var (
 	// Invalid characters or punctuation.
-	ErrFormatting = &validate.Error{
-		Level:   validate.ErrInvalid,
-		Message: errors.New("Invalid formatting"),
+	ErrFormatting = &validate.ValidatorError{
+		ErrLevel: validate.ErrInvalid,
+		Message:  errors.New("Invalid formatting"),
 	}
 )
 
@@ -45,7 +35,7 @@ func (p *Printable) Message() string {
 }
 
 // Check to ensure the byte slice only contains printable UTF-8 runes
-func (m *Printable) Validate(v validate.Validator) *validate.Error {
+func (m *Printable) Validate(v validate.Validator) validate.Error {
 	p := m.data
 	// Borrowed from utf.Valid() with added checks for printable runes
 	for i := 0; i < len(p); {
@@ -97,7 +87,7 @@ func (p *Lower) Message() string {
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes
-func (m *Lower) Validate(v validate.Validator) *validate.Error {
+func (m *Lower) Validate(v validate.Validator) validate.Error {
 	p := m.data
 	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {
@@ -150,7 +140,7 @@ func (p *Upper) Message() string {
 }
 
 // Check to ensure the byte slice only contains lower case UTF-8 runes
-func (m *Upper) Validate(v validate.Validator) *validate.Error {
+func (m *Upper) Validate(v validate.Validator) validate.Error {
 	p := m.data
 	// Borrowed from utf.Valid() with added checks for lower case runes
 	for i := 0; i < len(p); {

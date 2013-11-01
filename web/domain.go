@@ -54,6 +54,12 @@ func (d *Domain) MaxSubdomains(m int) *Domain {
 	return d
 }
 
+// Specifies the maximum number of sub-domains to allow.
+func (d *Domain) MaxLength(m int) *Domain {
+	d.checks["maxlength"] = m
+	return d
+}
+
 var (
 	// A-Z, a-z, 0-9, and hyphen are the only valid characters for domains.
 	domainTable = &unicode.RangeTable{
@@ -68,30 +74,30 @@ var (
 )
 var (
 	// Entire domain or a single label has an invalid length.
-	ErrDomainLength = &validate.Error{
-		Level:   validate.ErrInvalid,
-		Message: errors.New("Invalid length"),
+	ErrDomainLength = &validate.ValidatorError{
+		ErrLevel: validate.ErrInvalid,
+		Message:  errors.New("Invalid length"),
 	}
 
 	// Invalid characters or punctuation.
-	ErrFormatting = &validate.Error{
-		Level:   validate.ErrInvalid,
-		Message: errors.New("Invalid formatting"),
+	ErrFormatting = &validate.ValidatorError{
+		ErrLevel: validate.ErrInvalid,
+		Message:  errors.New("Invalid formatting"),
 	}
 
 	// Unknown error, probably really bad.
-	ErrUnknown = &validate.Error{
-		Level:   2,
-		Message: errors.New("Unknown error"),
+	ErrUnknown = &validate.ValidatorError{
+		ErrLevel: 2,
+		Message:  errors.New("Unknown error"),
 	}
 )
 
 // Checks for a valid domain name. Checks lengths, characters, and looks for a
 // valid TLD (according to IANA).
-func (d *Domain) Validate(v validate.Validator) *validate.Error {
+func (d *Domain) Validate(v validate.Validator) validate.Error {
 	//func IsDomain(p []byte) (res validate.Result) {
 	// Domain rules:
-	// - 253 character total length max
+	// - 255 character total length max
 	// - 63 character label max
 	// - 127 sub-domains
 	// - Characters a-z, A-Z, 0-9, and -
@@ -101,16 +107,21 @@ func (d *Domain) Validate(v validate.Validator) *validate.Error {
 	// Check for max length.
 	// NOTE: Invalid unicode will count as a 1 byte rune, but we'll catch that
 	// later.
+
 	p := d.domain
-	if utf8.RuneCount(p) > 252 {
+	// If a max length was specified, use it
+	if d.checks["maxlength"] != nil &&
+		utf8.RuneCount(p) > d.checks["maxlength"].(int) {
+		return ErrDomainLength
+
+	} else if utf8.RuneCount(p) > 255 {
 		return ErrDomainLength
 	}
 
 	// First we split by label
 	domain := bytes.Split(p, []byte("."))
-
 	// 127 sub-domains max (not including TLD)
-	if len(domain) > 127 {
+	if len(domain) > 128 {
 		return ErrDomainLength
 	}
 
@@ -126,7 +137,7 @@ func (d *Domain) Validate(v validate.Validator) *validate.Error {
 		}
 
 		// Check 63 character max.
-		if length > 62 {
+		if length > 63 {
 			return ErrDomainLength
 		}
 
@@ -178,6 +189,7 @@ func (d *Domain) Validate(v validate.Validator) *validate.Error {
 	}
 
 	// We have all valid unicode characters, now make sure the TLD is real.
+	// TODO(inhies): Add check for an all numeric TLD.
 	domainTLD := domain[len(domain)-1]
 	if tld.Valid(domainTLD) {
 		return nil
