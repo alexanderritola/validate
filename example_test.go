@@ -14,7 +14,7 @@ type IsCat struct {
 }
 
 // Check that the data we were given was something a cat would say (meow).
-func (c *IsCat) Validate(v validate.Validator) *validate.Error {
+func (c *IsCat) Validate(v validate.Validator) validate.Error {
 	// Check to see if the length is longer than allowed.
 	if len(c.data) > c.maxlen {
 		return &validate.Error{
