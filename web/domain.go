@@ -48,6 +48,12 @@ func (d *Domain) Message() string {
 	return d.message
 }
 
+// Specifies the minimum number of sub-domains to allow.
+func (d *Domain) MinSubdomains(m int) *Domain {
+	d.checks["minsubs"] = m
+	return d
+}
+
 // Specifies the maximum number of sub-domains to allow.
 func (d *Domain) MaxSubdomains(m int) *Domain {
 	d.checks["maxsubs"] = m
@@ -125,6 +131,9 @@ func (d *Domain) Validate(v validate.Validator) validate.Error {
 		return ErrDomainLength
 	}
 
+	if d.checks["minsubs"] != nil && len(domain) < d.checks["minsubs"].(int)+1 {
+		return ErrDomainLength
+	}
 	if d.checks["maxsubs"] != nil && len(domain) > d.checks["maxsubs"].(int)+1 {
 		return ErrDomainLength
 	}

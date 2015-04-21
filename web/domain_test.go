@@ -75,6 +75,25 @@ func Test_Domain_Validate_MaxLength(t *testing.T) {
 	}
 }
 
+var minSubs = []domainTest{
+	{"a.com", false},
+	{"a.b.com", true},
+	{"a.b.c.com", true},
+}
+
+// Test for setting minimum number of sub domains.
+func Test_Domain_Validate_MinSubs(t *testing.T) {
+	v := validate.NewValidator()
+	for i, d := range minSubs {
+		domain := NewDomain(d.Domain).MinSubdomains(2)
+		err := v.Validate(domain)
+		if (err != nil && d.Valid) || (err == nil && !d.Valid) {
+			t.Errorf("%d. IsValid(\"%s\") error: %v, want %v. Error: %v",
+				i, d.Domain, err != nil, d.Valid, err)
+		}
+	}
+}
+
 var maxSubs = []domainTest{
 	{"a.com", true},
 	{"a.b.com", true},
