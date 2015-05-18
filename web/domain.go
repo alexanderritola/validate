@@ -5,7 +5,7 @@ package web
 import (
 	"bytes"
 	"errors"
-	"github.com/daswasser/validate"
+	"github.com/alexanderritola/validate"
 	"github.com/inhies/go-tld"
 	"unicode"
 	"unicode/utf8"
