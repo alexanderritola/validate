@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/alexanderritola/validate"
-	"github.com/inhies/go-tld"
+	"github.com/MiCHiLU/go-tld"
 	"unicode"
 	"unicode/utf8"
 )
